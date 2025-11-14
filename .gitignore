@@ -1,14 +1,38 @@
-# Compiled files
+# Created by https://www.toptal.com/developers/gitignore/api/renpy
+# Edit at https://www.toptal.com/developers/gitignore?templates=renpy
+
+# dev files
+audio_dev/
+regretdemo.py
+
+### Renpy ###
+# Don't track content of these folders #
+########################################
+cache/
+saves/
+
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
 *.rpyc
-*.rpyb
-*.pyc
+*.rpymc
 
-# Temporary files
-*~
-tmp/*
 
-# Local-only files
-errors.txt
+# The log file and other misc things #
+######################################
 log.txt
+errors.txt
 traceback.txt
-game/saves
+files.txt
+
+# End of https://www.toptal.com/developers/gitignore/api/renpy
+
+*.bak
+*.*~
