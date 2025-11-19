@@ -291,10 +291,10 @@ label events_run_period:
 
     while not check_skip_period() and events:
 
-        $ _event = events.pop(0)
-        $ events_executed[_event] = True
-
-        call expression _event from call_expression_event_1
+        python:
+            _event = events.pop(0)
+            events_executed[_event] = True
+            renpy.call(_event)
 
     return
 

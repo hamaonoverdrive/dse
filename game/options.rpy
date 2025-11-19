@@ -1,11 +1,4 @@
-﻿##
-# Options file for the sample DSE game. If you have your own options.rpy
-# file, you can delete this one.
-#
-######################################################################
-
-
-## This file contains options that can be changed to customize your game.
+﻿## This file contains options that can be changed to customize your game.
 ##
 ## Lines beginning with two '#' marks are comments, and you shouldn't uncomment
 ## them. Lines beginning with a single '#' mark are commented-out code, and you
@@ -30,13 +23,14 @@ define gui.show_name = True
 
 ## The version of the game.
 
-define config.version = "4.0"
+define config.version = "4.1"
 
 
-## Text that is placed on the game's about screen. To insert a blank line
-## between paragraphs, write \n\n.
+## Text that is placed on the game's about screen. Place the text between the
+## triple-quotes, and leave a blank line between paragraphs.
 
-define gui.about = _("Ren'Py Dating Sim Engine\n\nBy renpytom, maintained by Andrea Landaker")
+define gui.about = _p("""Ren'Py Dating Sim Engine\n\nBy renpytom, maintained by Andrea Landaker.\n\nNew features added by hamaonoverdrive.
+""")
 
 
 ## A short name for the game used for executables and directories in the built
@@ -48,8 +42,9 @@ define build.name = "dse"
 
 ## Sounds and music ############################################################
 
-## These three variables control which mixers are shown to the player by
-## default. Setting one of these to False will hide the appropriate mixer.
+## These three variables control, among other things, which mixers are shown
+## to the player by default. Setting one of these to False will hide the
+## appropriate mixer.
 
 define config.has_sound = True
 define config.has_music = True
@@ -80,6 +75,11 @@ define config.has_voice = True
 
 define config.enter_transition = dissolve
 define config.exit_transition = dissolve
+
+
+## Between screens of the game menu.
+
+define config.intra_transition = dissolve
 
 
 ## A transition that is used after a game has been loaded.
@@ -117,8 +117,8 @@ define config.window_hide_transition = Dissolve(.2)
 
 ## Preference defaults #########################################################
 
-## Controls the default text speed. The default, 0, is infinite, while any other
-## number is the number of characters per second to type out.
+## Controls the default text speed. The default, 0, is infinite, while any
+## other number is the number of characters per second to type out.
 
 default preferences.text_cps = 0
 
@@ -172,8 +172,8 @@ init python:
     ##
     ## ** matches all characters, including the directory separator.
     ##
-    ## For example, "*.txt" matches txt files in the base directory, "game/
-    ## **.ogg" matches ogg files in the game directory or any of its
+    ## For example, "*.txt" matches txt files in the base directory,
+    ## "game/**.ogg" matches ogg files in the game directory or any of its
     ## subdirectories, and "**.psd" matches psd files anywhere in the project.
 
     ## Classify files as None to exclude them from the built distributions.
@@ -195,9 +195,10 @@ init python:
     build.documentation('*.html')
     build.documentation('*.txt')
 
-## A Google Play license key is required to download expansion files and perform
-## in-app purchases. It can be found on the "Services & APIs" page of the Google
-## Play developer console.
+
+## A Google Play license key is required to perform in-app purchases. It can be
+## found in the Google Play developer console, under "Monetize" > "Monetization
+## Setup" > "Licensing".
 
 # define build.google_play_key = "..."
 
