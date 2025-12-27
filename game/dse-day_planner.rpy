@@ -26,6 +26,7 @@ init -100 python:
 
     def dp_period(name, var):
         __periods[name] = store.__period = __Period(name, var)
+        persistent.hardcore_tracked_stats.add(var)
 
     __None = object()
         

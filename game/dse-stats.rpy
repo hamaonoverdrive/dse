@@ -21,10 +21,6 @@ init -100 python:
     def __init_stats():
         for s in __dse_stats:
             setattr(store, s.var, s.default)
-        # other engine variables that we need to be sure get crammed in our hardcore store
-        keywords = ["day", "events_executed", "events_executed_yesterday"]
-        for word in keywords:
-            persistent.hardcore_tracked_stats.add(word)
 
     config.start_callbacks.append(__init_stats)
     

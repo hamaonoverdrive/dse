@@ -7,13 +7,23 @@ init -200 python:
 
     def update_persistent(label, jumped):
         # ignore labels that start with underscores or are on our banned list
-        banned = ["main_menu_screen", "save_screen"]
-        if label[0] != "_" and label not in banned:
+        # also only save when we aren't in a call to avoid stack issues
+        banned = ["main_menu_screen", "save_screen", "events_run_period"]
+        if label not in [x.name for x in all_events] \
+                and label not in banned \
+                and label[0] != "_":
             persistent.hardcore_label = label
             for stat in persistent.hardcore_tracked_stats:
                 if hasattr(store, stat):
                     persistent.hardcore_stat_values[stat] = getattr(store, stat)
 
+    def __init_hardcore():
+        # other engine variables that we need to be sure get crammed in our hardcore store
+        keywords = ["day", "events_executed", "events_executed_yesterday"]
+        for word in keywords:
+            persistent.hardcore_tracked_stats.add(word)
+
+    config.start_callbacks.append(__init_hardcore)
     config.label_callbacks.append(update_persistent)
 
     if persistent.hardcore == None:

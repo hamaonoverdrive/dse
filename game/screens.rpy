@@ -298,16 +298,17 @@ screen navigation():
 
         spacing gui.navigation_spacing
 
-        if persistent.hardcore and persistent.hardcore_label is not None:
-            $ start_text = "Resume"
-        else:
-            $ start_text = "Start"
-
         if main_menu:
 
-            textbutton _(start_text) action Start("_hardcore_check")
+            if persistent.hardcore and persistent.hardcore_label is not None:
 
-        if start_text == "Resume":
+                textbutton _("Resume") action Start("_hardcore_check")
+
+            else:
+
+                textbutton _("Start") action Start("_hardcore_check")
+
+        if persistent.hardcore and persistent.hardcore_label is not None:
 
             textbutton _("Restart Run") action ShowMenu("restart_hardcore")
 
