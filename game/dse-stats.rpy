@@ -10,12 +10,13 @@ init -100 python:
 
     class __Stat(object):
 
-        def __init__(self, name, var, default, max, hidden=False):
+        def __init__(self, name, var, default, max, hidden=False, relationship=False):
             self.name = name
             self.var = var
             self.default = default
             self.max = max
             self.hidden = hidden
+            self.relationship = relationship # True if item should be displayed on relationship screen
 
     def __init_stats():
         for s in __dse_stats:
@@ -30,8 +31,8 @@ init -100 python:
     # default: starting value for the stat
     # max: maximum value for the stat
     # hidden: Is this stat hidden from the user? Hidden stats will not be displayed in the stats screen.
-    def register_stat(name, var, default=0, max=100, hidden=False):
-        __dse_stats.append(__Stat(name, var, default, max, hidden))
+    def register_stat(name, var, default=0, max=100, hidden=False, relationship=False):
+        __dse_stats.append(__Stat(name, var, default, max, hidden, relationship))
 
     def normalize_stats():
         for s in __dse_stats:
@@ -50,11 +51,12 @@ init -100 python:
     config.python_callbacks.append(normalize_stats)                        
 
 # Display the stats in a frame.
-# name -  display the stat's name
-# bar -   display a bar indicating the value of the stat
-# value - display the numerical value of the stat
-# max -   display the maximum value of the stat
-screen display_stats(name=True, bar=True, value=True, max=True):
+# name -          display the stat's name
+# bar -           display a bar indicating the value of the stat
+# value -         display the numerical value of the stat
+# max -           display the maximum value of the stat
+# relationships - display stats flagged with "relationship=True"
+screen display_stats(name=True, bar=True, value=True, max=True, relationships=False):
     $ dse_stat_length = len(__dse_stats)
     
     #The number of rows is the number of stats that are not hidden
@@ -90,7 +92,11 @@ screen display_stats(name=True, bar=True, value=True, max=True):
                 
                 for s in __dse_stats:
                     #Skip if the stat is a hidden stat
-                    if (not s.hidden):
+                    $ show_stat = not s.hidden
+                    #Unless we're on the relationships screen, in which case only display relationship stats
+                    if relationships:
+                        $ show_stat = s.relationship
+                    if (show_stat):
                         $ v = getattr(store, s.var)
     
                             

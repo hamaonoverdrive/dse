@@ -25,6 +25,7 @@ init:
     $ event("hang", "act == 'hang'", event.solo(), priority=200)
     $ event("exercise", "act == 'exercise'", event.solo(), priority=200)    
     $ event("play", "act == 'play'", event.solo(), priority=200)
+    $ event("chat", "act == 'call'", event.solo(), priority=200)
 
 
     # This is an introduction event, that runs once when we first go
@@ -180,6 +181,15 @@ label play:
     $ relaxation += 10    
     return
 
+label chat:
+    "I decide to spend my evening catching up with my best friend over the phone."
+    "It's been a while since we talked, but he always has his finger on the pulse of the school."
+    show screen display_stats(relationships=True)
+    "He lets me know about my reputation around the school."
+    hide screen display_stats
+    "I thank him for his time and tell him to have a good night."
+    return
+
 
 # Below here are special events that are triggered when certain
 # conditions are true. 
@@ -293,14 +303,18 @@ label borrow_pen:
 
     "She says, and she goes back to studying."
 
+    $ glasses += 30
+
     return
 
 label gg_smiling:
 
     "I head to the library, to get some studying done."
 
-    "The glasses girl is there, and smiles at me for a second before
-     turning back to her book."
+    "The glasses girl is there, and smiles at me for a second before turning back to her book."
+
+    if glasses < 50:
+        $ glasses += 5
 
     "I decide not to disturb her, and instead start reading my own
      book."
@@ -360,6 +374,8 @@ label bookslide:
     "She lives farther than I thought, though, and I end up not having time for anything else by the time I get home."
     
     "But it was definitely worth it."
+
+    $ glasses = 70
         
     #This will end the current period and skip the next one.
     jump events_skip_period
@@ -403,6 +419,8 @@ label cookies:
      happiest guy in the world."
 
     "At this, she can only blush."
+
+    $ glasses = 100
 
     return
 
@@ -485,6 +503,8 @@ label catchme:
 
     "Even though I'm jogging, she pulls away as if it is nothing."
 
+    $ sporty = 30
+
     return
 
 label cantcatchme:
@@ -496,6 +516,9 @@ label cantcatchme:
     sg "Well, keep up the good work. One day you'll be as fast as me!"
 
     sg "Well, maybe."
+
+    if sporty < 50:
+        $ sporty += 5
 
     "She pulls out past me, and disappears into the distance. One day
      I'll catch up to her."
@@ -545,6 +568,9 @@ label caughtme:
 
     "I nod a third time, and we take off, running side by side."
 
+    if sporty < 70:
+        $ sporty += 10
+
     $ strength += 10
     $ relaxation -= 10    
 
@@ -560,6 +586,9 @@ label together:
 
     "Still, I can keep up with her for the rest of the run. And that's
      not bad."
+
+    if sporty < 70:
+        $ sporty += 5
 
     $ strength += 10
 
@@ -579,6 +608,9 @@ label apart:
 
     "She's right, of course, and I redouble my efforts to try to keep
      up with her."
+
+    if sporty < 70:
+        $ sporty += 10
 
     $ strength += 10
     $ relaxation -= 10    
@@ -640,6 +672,8 @@ label pothole:
     "She lives farther than I thought, though, and I end up not having time for anything else by the time I get home."
     
     "But it was definitely worth it."
+
+    $ sporty = 100
     
     #This will end the current period and skip the next one.
     jump events_skip_period

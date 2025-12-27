@@ -19,6 +19,8 @@ init python:
     register_stat("Strength", "strength", 10, 100)
     register_stat("Intelligence", "intelligence", 10, 100)
     register_stat("Relaxation", "relaxation", hidden=True)
+    register_stat("Glasses Girl", "glasses", 0, 100, hidden=True, relationship=True)
+    register_stat("Sporty Girl", "sporty", 0, 100, hidden=True, relationship=True)
 
     dp_period("Morning", "morning_act")
     dp_choice("Attend Class", "class")
@@ -34,6 +36,7 @@ init python:
     dp_period("Evening", "evening_act")
     dp_choice("Exercise", "exercise")
     dp_choice("Play Games", "play")
+    dp_choice("Call Friend", "call")
 
     
 # This is the entry point into the game.
