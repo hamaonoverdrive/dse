@@ -21,6 +21,10 @@ init -100 python:
     def __init_stats():
         for s in __dse_stats:
             setattr(store, s.var, s.default)
+        # other engine variables that we need to be sure get crammed in our hardcore store
+        keywords = ["day", "events_executed", "events_executed_yesterday"]
+        for word in keywords:
+            persistent.hardcore_tracked_stats.add(word)
 
     config.start_callbacks.append(__init_stats)
     
@@ -33,6 +37,7 @@ init -100 python:
     # hidden: Is this stat hidden from the user? Hidden stats will not be displayed in the stats screen.
     def register_stat(name, var, default=0, max=100, hidden=False, relationship=False):
         __dse_stats.append(__Stat(name, var, default, max, hidden, relationship))
+        persistent.hardcore_tracked_stats.add(var)
 
     def normalize_stats():
         for s in __dse_stats:

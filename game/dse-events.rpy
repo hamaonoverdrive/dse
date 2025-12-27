@@ -468,6 +468,7 @@ label gg_confess:
 
     ".:. Ending 1."
 
+    $ persistent.hardcore_label = None
     $ renpy.full_restart()
 
 
@@ -746,6 +747,7 @@ label sg_confess:
 
     ".:. Ending 2."
 
+    $ persistent.hardcore_label = None
     $ renpy.full_restart()
 
 
@@ -816,6 +818,7 @@ label both_confess:
 
     ".:. Ending 3."
 
+    $ persistent.hardcore_label = None
     $ renpy.full_restart()
     
 label relaxed_ending:
@@ -827,4 +830,5 @@ label relaxed_ending:
     "...right?"
     
     ".:. Ending 4."
+    $ persistent.hardcore_label = None
     $ renpy.full_restart()    

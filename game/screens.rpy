@@ -250,9 +250,10 @@ screen quick_menu():
             textbutton _("History") action ShowMenu('history')
             textbutton _("Skip") action Skip() alternate Skip(fast=True, confirm=True)
             textbutton _("Auto") action Preference("auto-forward", "toggle")
-            textbutton _("Save") action ShowMenu('save')
-            textbutton _("Q.Save") action QuickSave()
-            textbutton _("Q.Load") action QuickLoad()
+            if not persistent.hardcore:
+                textbutton _("Save") action ShowMenu('save')
+                textbutton _("Q.Save") action QuickSave()
+                textbutton _("Q.Load") action QuickLoad()
             textbutton _("Prefs") action ShowMenu('preferences')
 
 
@@ -297,17 +298,28 @@ screen navigation():
 
         spacing gui.navigation_spacing
 
+        if persistent.hardcore and persistent.hardcore_label is not None:
+            $ start_text = "Resume"
+        else:
+            $ start_text = "Start"
+
         if main_menu:
 
-            textbutton _("Start") action Start()
+            textbutton _(start_text) action Start("_hardcore_check")
 
-        else:
+        if start_text == "Resume":
+
+            textbutton _("Restart Run") action ShowMenu("restart_hardcore")
+
+        if not main_menu:
 
             textbutton _("History") action ShowMenu("history")
 
-            textbutton _("Save") action ShowMenu("save")
+            if not persistent.hardcore:
+                textbutton _("Save") action ShowMenu("save")
 
-        textbutton _("Load") action ShowMenu("load")
+        if not persistent.hardcore:
+            textbutton _("Load") action ShowMenu("load")
 
         textbutton _("Preferences") action ShowMenu("preferences")
 
