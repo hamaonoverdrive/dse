@@ -72,3 +72,13 @@ style dse_stats_value_label:
 # Center the stat bar vertically.
 style dse_stats_bar:
     yalign 0.5
+
+style dse_event_popup_frame:
+    is confirm_frame
+    align (0.0, 0.0)
+style dse_event_popup_hbox:
+    spacing 10
+style dse_event_popup_vbox:
+    spacing 2
+style dse_event_popup_text:
+    is text

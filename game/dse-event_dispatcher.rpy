@@ -48,6 +48,7 @@ init -100 python:
             self.exprs = exprs
 
             self.priority = kwargs.get('priority', 100)
+            self.title = kwargs.get("title", None)
 
             all_events.append(self)
 
@@ -251,6 +252,7 @@ label events_end_day:
 label events_run_period:
 
     $ events = [ ]
+    $ event_titles = { }
 
     python hide:
 
@@ -287,6 +289,8 @@ label events_run_period:
                 continue
             
             events.append(i.name)
+            if i.title is not None:
+                event_titles[i.name] = i.title
 
 
     while not check_skip_period() and events:
@@ -294,7 +298,23 @@ label events_run_period:
         python:
             _event = events.pop(0)
             events_executed[_event] = True
+
+            title = _event.replace("_"," ").title()
+            # load in event title from specification, if it exists
+            if _event in event_titles.keys():
+                title = event_titles[_event]
+
+        # event titles starting with _ are ignored
+        if title[0] != "_":
+            $ narrator.add_history(kind="adv", who="Event:", what=title)
+            show screen event_popup(title)
+
+        python:
+            if persistent.hardcore:
+                renpy.block_rollback()
             renpy.call(_event)
+
+        hide screen event_popup
 
     return
 
@@ -325,4 +345,31 @@ init 100:
             if not renpy.has_label(i.name):
                 raise Exception("'%s' is defined as an event somewhere in the game, but no label named '%s' was defined anywhere." % (i.name, i.name))
     
+screen event_popup(title):
 
+    zorder 190
+
+    tag event_popup
+
+    frame:
+        style_prefix 'dse_event_popup'
+        ## The transform that makes it pop out
+        at event_popout()
+        has hbox
+        vbox:
+            text title
+
+    # timer 5.0 action [Hide("dse_event_popup"), Hide()]
+
+transform event_popout():
+    ## The `on show` event occurs when the screen is first shown.
+    on show:
+        ## Align it off-screen at the left. Note that no y information is
+        ## given, as that is handled on the popup screen.
+        xpos 0.0 xanchor 1.0
+        ## Ease it on-screen
+        easein_back 0.25 xpos 0.0 xanchor 0.0
+    ## The `on hide, replaced` event occurs when the screen is hidden.
+    on hide, replaced:
+        ## Ease it off-screen again.
+        easeout_back 0.25 xpos 0.0 xanchor 1.0

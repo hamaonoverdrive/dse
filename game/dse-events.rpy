@@ -18,8 +18,8 @@ init:
     
     $ event("class", "act == 'class'", event.only(), priority=200)
     $ event("class_bad", "act == 'class'", priority=210)
-    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200)
-    $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200)
+    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class")
+    $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class")
     $ event("fly", "act == 'fly'", event.solo(), priority=200)
     $ event("study", "act == 'study'", event.solo(), priority=200)
     $ event("hang", "act == 'hang'", event.solo(), priority=200)

@@ -8,20 +8,24 @@ init -200 python:
     def update_persistent(label, jumped):
         # ignore labels that start with underscores or are on our banned list
         # also only save when we aren't in a call to avoid stack issues
-        banned = ["main_menu_screen", "save_screen", "events_run_period"]
-        if label not in [x.name for x in all_events] \
-                and label not in banned \
-                and label[0] != "_":
+        banned = ["main_menu_screen", "save_screen"]
+        event_names = [x.name for x in all_events]
+        banned.extend(event_names)
+
+        if label not in banned and label[0] != "_":
             persistent.hardcore_label = label
             for stat in persistent.hardcore_tracked_stats:
                 if hasattr(store, stat):
                     persistent.hardcore_stat_values[stat] = getattr(store, stat)
+            renpy.save_persistent()
 
     def __init_hardcore():
         # other engine variables that we need to be sure get crammed in our hardcore store
         keywords = ["day", "events_executed", "events_executed_yesterday"]
         for word in keywords:
             persistent.hardcore_tracked_stats.add(word)
+        # just change this from the default (save) because that breaks hardcore mode
+        setattr(store, "_game_menu_screen", "preferences")
 
     config.start_callbacks.append(__init_hardcore)
     config.label_callbacks.append(update_persistent)
@@ -63,12 +67,3 @@ label _restart_hardcore:
         persistent.hardcore_stat_values = {}
         renpy.full_restart()
 
-screen restart_hardcore():
-
-    tag menu
-
-    use game_menu(_("Reset Hardcore Data"), scroll="viewport"):
-
-        vbox:
-            label _("Are you sure you want to restart your run?")
-            textbutton _("Yes") action Jump("_restart_hardcore")

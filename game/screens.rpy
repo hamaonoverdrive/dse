@@ -588,6 +588,17 @@ style about_text is gui_text
 style about_label_text:
     size gui.label_text_size
 
+# custome screen for hardcore mode
+
+screen restart_hardcore():
+
+    tag menu
+
+    use game_menu(_("Restart Run")):
+        fixed:
+            vbox xycenter(0.5, 0.5):
+                label _("Are you sure you want to restart your run?")
+                textbutton _("Yes") action Jump("_restart_hardcore") xalign 0.5
 
 ## Load and Save screens #######################################################
 ##
