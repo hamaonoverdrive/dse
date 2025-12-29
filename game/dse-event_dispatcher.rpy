@@ -88,6 +88,34 @@ init -100 python:
 
             return rv
 
+        # The following two methods are used for the event viewer
+        # viewable: whether an event can be seen in the viewer
+        def is_viewable(self):
+            if self.title is None:
+                return False
+
+            if self.title[0] == "_":
+                return False
+
+            if self.is_child:
+                return False
+
+            return True
+
+        # visitable: whether a player has fully seen an event
+        def is_visitable(self, checking_child=False):
+            if not checking_child and not self.is_viewable():
+                return False
+
+            if not renpy.seen_label(self.name):
+                return False
+
+            for child in self.children:
+                if child is not None and not child.is_visitable(True):
+                    return False
+            return True
+
+
 
         # The base class for all of the event checks given below.
         class event_check(object):
@@ -386,6 +414,14 @@ label events_skip_period:
     $ skip_periods = 2
     return
 
+# used for the event viewer to handle events with children
+label _view_event:
+
+    while events:
+        $ _event = events.pop(0)
+        $ renpy.call(_event)
+
+    $ renpy.end_replay()
         
 init 100:
     python hide:

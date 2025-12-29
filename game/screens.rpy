@@ -328,11 +328,13 @@ screen navigation():
 
             textbutton _("End Replay") action EndReplay(confirm=True)
 
-        elif not main_menu:
+        else:
 
             textbutton _("Event Viewer") action ShowMenu("viewer")
 
-            textbutton _("Main Menu") action MainMenu()
+            if not main_menu:
+
+                textbutton _("Main Menu") action MainMenu()
 
         textbutton _("About") action ShowMenu("about")
 
@@ -610,8 +612,8 @@ screen viewer():
 
         vbox:
             for e in sorted(all_events, key=lambda y:y.title):
-                if event_is_viewable(e):
-                    textbutton e.title action Call("_view_event", e) sensitive event_is_revisitable(e)
+                if e.is_viewable():
+                    textbutton e.title action Replay("_view_event", scope={"events":[e.name]}) sensitive e.is_visitable()
 
 ## Load and Save screens #######################################################
 ##
