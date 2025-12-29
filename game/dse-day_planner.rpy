@@ -12,7 +12,7 @@ init -100 python:
 
     # A map from period name to the information we know about that
     # period.
-    __periods = { }
+    periods = { }
 
     # The period we're updating.
     __period = None
@@ -25,7 +25,8 @@ init -100 python:
             self.acts = [ ]
 
     def dp_period(name, var):
-        __periods[name] = store.__period = __Period(name, var)
+        periods[name] = store.__period = __Period(name, var)
+        persistent.hardcore_tracked_stats.add(var)
 
     __None = object()
         
@@ -47,41 +48,53 @@ init -100 python:
         
 # Our Day Planner displays the stats, and buttons for the user to choose
 # what to do during each period of time defined in "periods".
-screen day_planner(periods):  
+screen day_planner(display_periods):  
     # indicate to Ren'Py engine that this is a choice point
     $ renpy.choice_for_skipping()
     frame:
         style "dayplanner_frame"          
         use display_stats(name=True, bar=True, value=True, max=True)
-        use display_planner(periods)
+        use display_planner(display_periods)
             
-screen display_planner(periods):            
+screen display_planner(display_periods):
     frame:
-        style_group "dp"        
+        style_group "dp"
         vbox:
             text "Day Planner" yalign 0.0 xalign 0.5
             hbox:
                 $ can_continue = True
-                for p in periods:
+                for p in display_periods:
                     vbox:
                         label p
-                        if p not in __periods:
+                        if p not in periods:
                             $ raise Exception("Period %r was never defined." % p)
-                        $ this_period = __periods[p]
+                        $ this_period = periods[p]
                         $ selected_choice = getattr(store, this_period.var)
 
                         $ valid_choice = False
                         vbox:
-                            style "dp_choice_vbox"                                                    
+                            style "dp_choice_vbox"
                             for name, curr_val, enable, should_show in this_period.acts:
-                                $ show_this = eval(should_show)
-                                $ enable = eval(enable)
+                                python:
+                                    show_this = eval(should_show)
+                                    enable = eval(enable)
 
-                                $ selected = (selected_choice == curr_val)
+                                    selected = (selected_choice == curr_val)
+
+                                    # see if one of the rolled events for this period will give us a hint
+                                    hinted = False
+                                    for e in rolled_events[curr_val]:
+                                        eObj = event_name_to_obj(e)
+                                        if eObj.hintable:
+                                            hinted = True
+                                            break
                         
                                 if show_this:
                                     if enable:
-                                        textbutton name action SetField(store, this_period.var, curr_val)
+                                        if hinted:
+                                            textbutton name action SetField(store, this_period.var, curr_val) style_prefix "hinted"
+                                        else:
+                                            textbutton name action SetField(store, this_period.var, curr_val)
                                     else:
                                         textbutton name
             

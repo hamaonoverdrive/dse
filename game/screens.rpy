@@ -250,9 +250,10 @@ screen quick_menu():
             textbutton _("History") action ShowMenu('history')
             textbutton _("Skip") action Skip() alternate Skip(fast=True, confirm=True)
             textbutton _("Auto") action Preference("auto-forward", "toggle")
-            textbutton _("Save") action ShowMenu('save')
-            textbutton _("Q.Save") action QuickSave()
-            textbutton _("Q.Load") action QuickLoad()
+            if not persistent.hardcore:
+                textbutton _("Save") action ShowMenu('save')
+                textbutton _("Q.Save") action QuickSave()
+                textbutton _("Q.Load") action QuickLoad()
             textbutton _("Prefs") action ShowMenu('preferences')
 
 
@@ -299,15 +300,27 @@ screen navigation():
 
         if main_menu:
 
-            textbutton _("Start") action Start()
+            if persistent.hardcore and persistent.hardcore_label is not None:
 
-        else:
+                textbutton _("Resume") action Start("_hardcore_check")
+
+            else:
+
+                textbutton _("Start") action Start("_hardcore_check")
+
+        if persistent.hardcore and persistent.hardcore_label is not None:
+
+            textbutton _("Restart Run") action ShowMenu("restart_hardcore")
+
+        if not main_menu:
 
             textbutton _("History") action ShowMenu("history")
 
-            textbutton _("Save") action ShowMenu("save")
+            if not persistent.hardcore:
+                textbutton _("Save") action ShowMenu("save")
 
-        textbutton _("Load") action ShowMenu("load")
+        if not persistent.hardcore:
+            textbutton _("Load") action ShowMenu("load")
 
         textbutton _("Preferences") action ShowMenu("preferences")
 
@@ -316,6 +329,8 @@ screen navigation():
             textbutton _("End Replay") action EndReplay(confirm=True)
 
         elif not main_menu:
+
+            textbutton _("Event Viewer") action ShowMenu("viewer")
 
             textbutton _("Main Menu") action MainMenu()
 
@@ -575,6 +590,28 @@ style about_text is gui_text
 style about_label_text:
     size gui.label_text_size
 
+# custome screen for hardcore mode
+
+screen restart_hardcore():
+
+    tag menu
+
+    use game_menu(_("Restart Run")):
+        fixed:
+            vbox xycenter(0.5, 0.5):
+                label _("Are you sure you want to restart your run?")
+                textbutton _("Yes") action Jump("_restart_hardcore") xalign 0.5
+
+screen viewer():
+
+    tag menu
+
+    use game_menu(_("Event Viewer"), scroll="viewport"):
+
+        vbox:
+            for e in sorted(all_events, key=lambda y:y.title):
+                if event_is_viewable(e):
+                    textbutton e.title action Call("_view_event", e) sensitive event_is_revisitable(e)
 
 ## Load and Save screens #######################################################
 ##
