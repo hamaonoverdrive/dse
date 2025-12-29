@@ -16,16 +16,16 @@ init:
     # First up, we define some simple events for the various actions, that
     # are run only if no higher-priority event is about to occur.
     
-    $ event("class", "act == 'class'", event.only(), priority=200)
-    $ event("class_bad", "act == 'class'", priority=210)
-    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class!")
-    $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class")
-    $ event("fly", "act == 'fly'", event.solo(), priority=200)
-    $ event("study", "act == 'study'", event.solo(), priority=200)
-    $ event("hang", "act == 'hang'", event.solo(), priority=200)
-    $ event("exercise", "act == 'exercise'", event.solo(), priority=200)    
-    $ event("play", "act == 'play'", event.solo(), priority=200)
-    $ event("chat", "act == 'call'", event.solo(), priority=200)
+    $ event("class", "act == 'class'", event.only(), priority=200, title="_class")
+    $ event("class_bad", "act == 'class'", priority=210, title="_class")
+    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="_cut1")
+    $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200, title="_cut2")
+    $ event("fly", "act == 'fly'", event.solo(), priority=200, title="Flying Away!")
+    $ event("study", "act == 'study'", event.solo(), priority=200, title="_study")
+    $ event("hang", "act == 'hang'", event.solo(), priority=200, title="_hang")
+    $ event("exercise", "act == 'exercise'", event.solo(), priority=200, title="_exercise")    
+    $ event("play", "act == 'play'", event.solo(), priority=200, title="_play")
+    $ event("chat", "act == 'call'", event.solo(), priority=200, title="_chat")
 
 
     # This is an introduction event, that runs once when we first go
