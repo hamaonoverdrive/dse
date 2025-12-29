@@ -49,7 +49,9 @@ init -100 python:
 
             self.priority = kwargs.get('priority', 100)
             self.title = kwargs.get("title", None)
+            self.hintable = kwargs.get("hintable", False)
 
+            global all_events
             all_events.append(self)
 
         # Checks to see if this event is valid. It's called with
@@ -57,6 +59,7 @@ init -100 python:
         # True, and returns True if this event checks out.
         def check(self, valid):
 
+            global act
             for i in self.exprs:
                 if not i.eval(self.name, valid):
                     return False
@@ -97,12 +100,14 @@ init -100 python:
                 self.expr = expr
 
             def eval(self, name, valid):
+                global act
                 return eval(self.expr)
 
         # If present as a condition to an event, an object of this
         # type ensures that the event will only execute once.
         class once(event_check):
             def eval(self, name, valid):
+                global act
                 return name not in events_executed
 
         # Returns True if no event of higher priority can execute,
@@ -168,6 +173,7 @@ init -100 python:
                 self.cond = cond
 
             def eval(self, name, valid):
+                global act
                 return not self.cond.eval(name, valid)
 
         # Handles the and operator.
@@ -177,6 +183,7 @@ init -100 python:
                 self.args = args
 
             def eval(self, name, valid):
+                global act
                 for i in self.args:
                     if not i.eval(name, valid):
                         return False
@@ -189,6 +196,7 @@ init -100 python:
                 self.args = args
 
             def eval(self, name, valid):
+                global act
                 for i in self.args:
                     if i.eval(name, valid):
                         return True
@@ -229,7 +237,85 @@ init -100 python:
         store.events_executed_yesterday = { }
 
     config.start_callbacks.append(__events_init)
-        
+
+    def eventNameToObj(name):
+        global all_events
+        for e in all_events:
+            if e.name == name:
+                return e
+        return None
+
+    class EventChecker:
+
+        def setActVars(selected_act):
+            global act
+            global events
+            global rolled_evennts
+            act = selected_act
+            events = rolled_events[act]
+
+        def getAllValid():
+            global periods
+            global act
+
+            # save whatever act is so we can restore it later
+            if hasattr(store, "act"):
+                old_act = act
+            else:
+                old_act = None
+            results = { }
+            result_names = { }
+
+            for p in periods.values():
+                for a in p.acts:
+                    act = a[1]
+                    results[act] = EventChecker.getValid()
+
+            if old_act is not None:
+                act = old_act
+            return results
+
+        def getValid():
+            global all_events
+
+            events = [ ]
+            event_titles = { }
+
+            eobjs = [ ]
+            egroups = { }
+            eingroup = { }
+
+            for i in all_events:
+                if not i.check(eobjs):
+                    continue
+                    
+                eobjs.append(i)
+
+                props = i.properties()
+
+                if 'group' in props:
+                    group = props['group']
+                    count = props['group_count']
+
+                    egroups.setdefault(group, [ ]).extend([ i ] * count)
+                    eingroup[i] = group
+
+                if 'only' in props:
+                    break
+
+            echosen = { }
+
+            for k in egroups:
+                echosen[k] = renpy.random.choice(egroups[k])
+
+            for i in eobjs:
+
+                if i in eingroup and echosen[eingroup[i]] is not i:
+                    continue
+
+                events.append(i.name)
+
+            return events
 
 # This should called at the end of a (game) day, to let things
 # like depends_yesterday to work.
@@ -251,61 +337,21 @@ label events_end_day:
 # events that should be run for that period. 
 label events_run_period:
 
-    $ events = [ ]
-    $ event_titles = { }
-
-    python hide:
-
-        eobjs = [ ]
-        egroups = { }
-        eingroup = { }
-
-        for i in all_events:
-            if not i.check(eobjs):
-                continue
-                
-            eobjs.append(i)
-
-            props = i.properties()
-
-            if 'group' in props:
-                group = props['group']
-                count = props['group_count']
-
-                egroups.setdefault(group, [ ]).extend([ i ] * count)
-                eingroup[i] = group
-
-            if 'only' in props:
-                break
-
-        echosen = { }
-
-        for k in egroups:
-            echosen[k] = renpy.random.choice(egroups[k])
-            
-        for i in eobjs:
-
-            if i in eingroup and echosen[eingroup[i]] is not i:
-                continue
-            
-            events.append(i.name)
-            if i.title is not None:
-                event_titles[i.name] = i.title
-
-
     while not check_skip_period() and events:
 
         python:
+            print(events)
             _event = events.pop(0)
             events_executed[_event] = True
 
-            title = _event.replace("_"," ").title()
-            # load in event title from specification, if it exists
-            if _event in event_titles.keys():
-                title = event_titles[_event]
+            title = eventNametoObj(_event).title
 
         # event titles starting with _ are ignored
-        if title[0] != "_":
+        # "there is no elegant solution for fizzbuzz"
+        if title is None or title[0] != "_":
+            if title is None:
+                # have to do this replacement after we check for a leading underscore
+                $ title = _event.replace("_"," ").title()
             $ narrator.add_history(kind="adv", who="Event:", what=title)
             show screen event_popup(title)
 
@@ -313,6 +359,8 @@ label events_run_period:
             if persistent.hardcore:
                 renpy.block_rollback()
             renpy.call(_event)
+            if persistent.hardcore:
+                update_persistent(None, False)
 
         hide screen event_popup
 

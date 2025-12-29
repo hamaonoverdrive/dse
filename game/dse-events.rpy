@@ -30,7 +30,7 @@ init:
 
     # This is an introduction event, that runs once when we first go
     # to class. 
-    $ event("introduction", "act == 'class'", event.once(), event.only())
+    $ event("introduction", "act == 'class'", event.once(), event.only(), hintable=True)
 
     # These are the events with glasses girl.
     #
@@ -46,7 +46,8 @@ init:
             # introduction event.
             event.depends("introduction"),
             # This takes priority over the study event.
-            priority=190)
+            priority=190,
+            title="Studying (Glasses Girl)")
 
     # She asks to borrow our pen. 
     $ event("borrow_pen",
@@ -57,51 +58,52 @@ init:
             event.once(),
             # It requires the introduction event to have run at least
             # one day before.
-            event.depends("introduction"))
+            event.depends("introduction"),
+            hintable=True)
 
     # After the pen, she smiles when she sees us.
     $ event("gg_smiling", "act == 'study'",
             event.solo(), event.depends("borrow_pen"),
-            priority = 180)
+            priority = 180, title="Smiling")
 
     # The bookslide.
     $ event("bookslide", "act == 'study' and intelligence == 100",
-            event.once(), event.depends("borrow_pen"))
+            event.once(), event.depends("borrow_pen"), hintable=True)
 
     # She makes us cookies.
     $ event("cookies", "act == 'study'",
-            event.once(), event.depends("bookslide"))
+            event.once(), event.depends("bookslide"), hintable=True)
 
     # Her solo ending.
     $ event("gg_confess", "act == 'class'",
-            event.once(), event.depends("cookies"))
+            event.once(), event.depends("cookies"), hintable=True)
     
     # Here are Sporty Girl's events that happen during the exercise act.
     $ event("catchme", "act == 'exercise'",
-            event.depends('introduction'), event.once())
+            event.depends('introduction'), event.once(), title="Catch Me!")
     $ event("cantcatchme", "act == 'exercise'",
-            event.depends('catchme'), event.solo(), priority=190)
+            event.depends('catchme'), event.solo(), priority=190, title="Can't Catch Me!")
     $ event("caughtme", "act == 'exercise' and strength >= 50",
-            event.depends('catchme'), event.once())
+            event.depends('catchme'), event.once(), title="Caught Me!", hintable=True)
     $ event("together", "act == 'exercise' and strength >= 50",
-            event.depends('caughtme'), event.solo(), priority=180)
+            event.depends('caughtme'), event.solo(), priority=180, hintable=True)
     $ event("apart", "act == 'exercise' and strength < 50",
             event.depends('caughtme'), event.solo(), priority=180)
     $ event("pothole", "act == 'exercise' and strength >= 100",
-            event.depends('caughtme'), event.once())
+            event.depends('caughtme'), event.once(), hintable=True)
     $ event("dontsee", "act == 'exercise'",
-            event.depends('pothole'), event.solo(), priority=170)
+            event.depends('pothole'), event.solo(), priority=170, title="Alone...")
     $ event("sg_confess", "act == 'class'",
-            event.depends('dontsee'), event.once())    
+            event.depends('dontsee'), event.once(), hintable=True, title="Sporty Girl Confession")    
     
     # Relaxed ending with no girls happens if we max out our hidden relaxation stat.
-    $ event("relaxed_ending", "act=='hang' and relaxation >= 100", event.once())
+    $ event("relaxed_ending", "act=='hang' and relaxation >= 100", event.once(), hintable=True)
 
     # Ending with both girls only happens if we have seen both of their final events
     # This needs to be higher-priority than either girl's ending.    
     $ event('both_confess', 'act == "class"',
             event.depends("dontsee"), event.depends("cookies"),
-            event.once(), priority = 50)
+            event.once(), priority = 50, hintable=True, title="Double Confession!")
      
 
 label class:

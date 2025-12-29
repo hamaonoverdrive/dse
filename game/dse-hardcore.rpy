@@ -13,7 +13,11 @@ init -200 python:
         banned.extend(event_names)
 
         if label not in banned and label[0] != "_":
-            persistent.hardcore_label = label
+            # we may manually invoke this without a label,
+            # in cases where we're looping and want to save decisions made
+            # before reaching a new label
+            if label is not None:
+                persistent.hardcore_label = label
             for stat in persistent.hardcore_tracked_stats:
                 if hasattr(store, stat):
                     persistent.hardcore_stat_values[stat] = getattr(store, stat)
@@ -21,7 +25,7 @@ init -200 python:
 
     def __init_hardcore():
         # other engine variables that we need to be sure get crammed in our hardcore store
-        keywords = ["day", "events_executed", "events_executed_yesterday"]
+        keywords = ["day", "events", "act", "events_executed", "events_executed_yesterday", "rolled_events"]
         for word in keywords:
             persistent.hardcore_tracked_stats.add(word)
         # just change this from the default (save) because that breaks hardcore mode

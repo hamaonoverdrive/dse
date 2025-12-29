@@ -32,7 +32,12 @@ style dp_label is label:
 # Center the label of each choice.
 style dp_label_text:
     text_align 0.5
-    
+
+# color hinted items differently
+style hinted_button_text:
+    color gui.choice_button_text_hover_color
+    hover_color gui.hover_color
+
 # Make each choice button the same size, and centered.
 style dp_button is button:
     size_group dp_choice
@@ -73,12 +78,16 @@ style dse_stats_value_label:
 style dse_stats_bar:
     yalign 0.5
 
+# Here you can change the styling on the popup menu with the event title
 style dse_event_popup_frame:
     is confirm_frame
     align (0.0, 0.0)
+
 style dse_event_popup_hbox:
     spacing 10
+
 style dse_event_popup_vbox:
     spacing 2
+
 style dse_event_popup_text:
     is text

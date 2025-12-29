@@ -79,6 +79,14 @@ label day:
 
     "It's day %(day)d."
 
+    # now we generate the full list of events that can be visited today
+
+    $ rolled_events = EventChecker.getAllValid()
+
+    # throw a label here to trigger the hardcore rollback event
+
+label post_roll:
+
     # Here, we want to set up some of the default values for the
     # day planner. In a more complicated game, we would probably
     # want to add and remove choices from the dp_ variables
@@ -91,7 +99,6 @@ label day:
     $ narrator("What should I do today?", interact=False)
     window show
     
-
     # Now, we call the day planner, which may set the act variables
     # to new values. We call it with a list of periods that we want
     # to compute the values for.
@@ -99,23 +106,25 @@ label day:
     window auto
     
     # We process each of the three periods of the day, in turn.
-label morning:
 
     # Tell the user what period it is.
     centered "Morning"
 
     # Set these variables to appropriate values, so they can be
     # picked up by the expression in the various events defined below. 
+    # we do this after the label so that they will be used properly in
+    # hardcore mode
     $ period = "morning"
-    $ act = morning_act
-    
+    $ EventChecker.setActVars(morning_act)
+
+label morning:
+
     # Execute the events for the morning.
     call events_run_period
 
     # That's it for the morning, so we fall through to the
     # afternoon.
 
-label afternoon:
 
     # It's possible that we will be skipping the afternoon, if one
     # of the events in the morning jumped to skip_next_period. If
@@ -128,12 +137,11 @@ label afternoon:
     centered "Afternoon"
 
     $ period = "afternoon"
-    $ act = afternoon_act
+    $ EventChecker.setActVars(afternoon_act)
+
+label afternoon:
 
     call events_run_period
-
-
-label evening:
     
     # The evening is the same as the afternoon.
     if check_skip_period():
@@ -142,8 +150,10 @@ label evening:
     centered "Evening"
 
     $ period = "evening"
-    $ act = evening_act
+    $ EventChecker.setActVars(evening_act)
     
+label evening:
+
     call events_run_period
 
 
