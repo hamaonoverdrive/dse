@@ -84,7 +84,7 @@ screen display_planner(display_periods):
                                     # see if one of the rolled events for this period will give us a hint
                                     hinted = False
                                     for e in rolled_events[curr_val]:
-                                        eObj = eventNameToObj(e)
+                                        eObj = event_name_to_obj(e)
                                         if eObj.hintable:
                                             hinted = True
                                             break

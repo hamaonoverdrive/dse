@@ -330,6 +330,8 @@ screen navigation():
 
         elif not main_menu:
 
+            textbutton _("Event Viewer") action ShowMenu("viewer")
+
             textbutton _("Main Menu") action MainMenu()
 
         textbutton _("About") action ShowMenu("about")
@@ -599,6 +601,17 @@ screen restart_hardcore():
             vbox xycenter(0.5, 0.5):
                 label _("Are you sure you want to restart your run?")
                 textbutton _("Yes") action Jump("_restart_hardcore") xalign 0.5
+
+screen viewer():
+
+    tag menu
+
+    use game_menu(_("Event Viewer"), scroll="viewport"):
+
+        vbox:
+            for e in sorted(all_events, key=lambda y:y.title):
+                if event_is_viewable(e):
+                    textbutton e.title action Call("_view_event", e) sensitive event_is_revisitable(e)
 
 ## Load and Save screens #######################################################
 ##

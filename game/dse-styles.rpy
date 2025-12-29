@@ -34,9 +34,14 @@ style dp_label_text:
     text_align 0.5
 
 # color hinted items differently
+style hinted_button:
+    xalign 0.5
+
 style hinted_button_text:
-    color gui.choice_button_text_hover_color
+    text_align 0.5
+    color "#D0D0D0"
     hover_color gui.hover_color
+    selected_color gui.selected_color
 
 # Make each choice button the same size, and centered.
 style dp_button is button:

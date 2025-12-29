@@ -48,8 +48,21 @@ init -100 python:
             self.exprs = exprs
 
             self.priority = kwargs.get('priority', 100)
-            self.title = kwargs.get("title", None)
             self.hintable = kwargs.get("hintable", False)
+            self.children = kwargs.get("children", [ ])
+            self.is_child = False
+
+            self.title = kwargs.get("title", None)
+            if self.title is None:
+                # if name starts with an underscore that means it's one we want to mark as hidden
+                if self.name[0] != "_":
+                    self.title = self.name.replace("_"," ").title()
+                else:
+                    self.title = self.name
+
+            for child in self.children:
+                if child is not None:
+                    child.is_child = True
 
             global all_events
             all_events.append(self)
@@ -238,7 +251,7 @@ init -100 python:
 
     config.start_callbacks.append(__events_init)
 
-    def eventNameToObj(name):
+    def event_name_to_obj(name):
         global all_events
         for e in all_events:
             if e.name == name:
@@ -339,29 +352,21 @@ label events_run_period:
 
     while not check_skip_period() and events:
 
-        python:
-            print(events)
-            _event = events.pop(0)
-            events_executed[_event] = True
-
-            title = eventNametoObj(_event).title
+        $ _event = events.pop(0)
+        $ events_executed[_event] = True
 
         # event titles starting with _ are ignored
-        # "there is no elegant solution for fizzbuzz"
-        if title is None or title[0] != "_":
-            if title is None:
-                # have to do this replacement after we check for a leading underscore
-                $ title = _event.replace("_"," ").title()
+        $ title = event_name_to_obj(_event).title
+        if title[0] != "_":
             $ narrator.add_history(kind="adv", who="Event:", what=title)
             show screen event_popup(title)
 
-        python:
-            if persistent.hardcore:
-                renpy.block_rollback()
-            renpy.call(_event)
-            if persistent.hardcore:
-                update_persistent(None, False)
+        if persistent.hardcore:
+            $ renpy.block_rollback()
+        $ renpy.call(_event)
 
+        if persistent.hardcore:
+            $ update_persistent(None, False)
         hide screen event_popup
 
     return

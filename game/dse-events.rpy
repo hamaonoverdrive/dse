@@ -18,7 +18,7 @@ init:
     
     $ event("class", "act == 'class'", event.only(), priority=200)
     $ event("class_bad", "act == 'class'", priority=210)
-    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class")
+    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class!")
     $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200, title="Cutting Class")
     $ event("fly", "act == 'fly'", event.solo(), priority=200)
     $ event("study", "act == 'study'", event.solo(), priority=200)
@@ -30,7 +30,13 @@ init:
 
     # This is an introduction event, that runs once when we first go
     # to class. 
-    $ event("introduction", "act == 'class'", event.once(), event.only(), hintable=True)
+    $ event("introduction", "act == 'class'", event.once(), event.only(), hintable=True,
+            children=[
+                None, # this is here so simulator knows it's possible to not progress to child event
+                event("_introduction_focus", 
+                      "False" # event is only triggered by manually adding it to event queue
+                      )
+            ])
 
     # These are the events with glasses girl.
     #
@@ -76,7 +82,7 @@ init:
 
     # Her solo ending.
     $ event("gg_confess", "act == 'class'",
-            event.once(), event.depends("cookies"), hintable=True)
+            event.once(), event.depends("cookies"), hintable=True, title="Glasses Girl Confession")
     
     # Here are Sporty Girl's events that happen during the exercise act.
     $ event("catchme", "act == 'exercise'",
@@ -198,8 +204,7 @@ label chat:
 
 label introduction:
 
-    "I run to school, and make it to my seat just as the bell
-     signalling the start of class rings."
+    "I run to school, and make it to my seat just as the bell signalling the start of class rings."
 
     t "Before we start, I have an announcement to make."
 
@@ -217,8 +222,7 @@ label introduction:
 
     "The one on the left is wearing glasses."
 
-    "Not too thick, but enough to let me know she probably reads alot
-     of books."
+    "Not too thick, but enough to let me know she probably reads a lot of books." # what does this mean 
 
     "If I look a little closely, I can find another difference."
 
@@ -240,16 +244,25 @@ label introduction:
 
     "She stops, and goes back to not saying anything."
 
-    t "Well, if that's all, you can take your seats and we can start
-       the class."
+    t "Well, if that's all, you can take your seats and we can start the class."
 
-    "They do, and our teacher begins his lecture."
-
-    "I don't think anyone pays much attention to it, however."
+    menu:
+        "They do, and our teacher begins his lecture."
+        "It takes some concentration, but I try to pay attention.":
+            $ events.insert(0, "_introduction_focus")
+        "I can't lock in.":
+            "I don't think anyone else manages to pay attention to lecture, either."
 
     return
 
+label _introduction_focus:
+    "Even with all the hubbub of the new students, I manage to pay attention to what the teacher has to say."
 
+    "I only see it out of the corner of my eye, but I swear that the girl with the glasses is sneaking glances at me."
+
+    $ glasses += 10
+    $ intelligence += 5
+    return
     
 label gg_studying:
 

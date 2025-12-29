@@ -2,17 +2,19 @@
 # Manages variables that need to be read from or to persistent variables for hardcore mode
 
 init -200 python:
+    import copy
+
     def set_hardcore(boolean):
         persistent.hardcore = boolean
 
     def update_persistent(label, jumped):
         # ignore labels that start with underscores or are on our banned list
         # also only save when we aren't in a call to avoid stack issues
-        banned = ["main_menu_screen", "save_screen"]
+        banned = ["main_menu_screen", "save_screen", "events_run_period"]
         event_names = [x.name for x in all_events]
         banned.extend(event_names)
 
-        if label not in banned and label[0] != "_":
+        if label is None or (label not in banned and label[0] != "_"):
             # we may manually invoke this without a label,
             # in cases where we're looping and want to save decisions made
             # before reaching a new label
@@ -20,7 +22,9 @@ init -200 python:
                 persistent.hardcore_label = label
             for stat in persistent.hardcore_tracked_stats:
                 if hasattr(store, stat):
-                    persistent.hardcore_stat_values[stat] = getattr(store, stat)
+                    # need to copy this because not making a copy of the events list
+                    # will lead to issues with editing a shared object
+                    persistent.hardcore_stat_values[stat] = copy.copy(getattr(store, stat))
             renpy.save_persistent()
 
     def __init_hardcore():

@@ -125,7 +125,6 @@ label morning:
     # That's it for the morning, so we fall through to the
     # afternoon.
 
-
     # It's possible that we will be skipping the afternoon, if one
     # of the events in the morning jumped to skip_next_period. If
     # so, we should skip the afternoon.
