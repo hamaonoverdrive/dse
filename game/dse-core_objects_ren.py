@@ -9,6 +9,7 @@ events_executed_yesterday = {}
 events = [] # queue of upcoming event names
 periods = {}
 period_order = []
+act = ""
 
 
 class S:
@@ -33,17 +34,6 @@ def register_stat(name, var, default=0, max=100, hidden=False, relationship=Fals
 
     stats[var] = __Stat(name, default, max)
     setattr(store, var, default)
-
-def normalize_stats():
-    global store
-    global stats
-
-    for var, stat in stats.items():
-        v = getattr(store, var)
-        if v > stat.max:
-            setattr(store, var, stat.max)
-        if v < 0:
-            setattr(store, var, 0)
 
 def reset():
     global events_executed
@@ -85,6 +75,11 @@ class EventDispatchSimulator(object):
     def __init__(self):
         self.rolled_events = None
 
+        # Sort all events on priority.
+        # kind of a weird place to put this but it's in a weird place in event_dispatcher too.
+        global all_events
+        all_events.sort(key=lambda i : i.priority)
+
     def start_day(self):
         self.rolled_events = EventChecker.getAllValid()
         global skip_periods
@@ -112,11 +107,11 @@ class EventDispatchSimulator(object):
         global period_order
         for period in period_order:
 
-            possible_acts[period] = []
+            possible_acts[period.name] = []
 
-            for name, curr_val, enable, should_show in period.act:
+            for name, curr_val, enable, should_show in period.acts:
                 if eval(enable) and eval(should_show):
-                    possible_acts[period].append(curr_val)
+                    possible_acts[period.name].append(curr_val)
 
         return possible_acts
 
@@ -136,6 +131,7 @@ class EventDispatchSimulator(object):
         # cram everything from our fake store into locals so that stat changes will work properly
         global store
         global stats
+        global skip_period
         for var in stats.keys():
             locals()[var] = getattr(store, var)
 
@@ -147,23 +143,29 @@ class EventDispatchSimulator(object):
                 events_executed[_event] = True
 
                 e = event_name_to_obj(_event)
-                for change in e.changes():
+                for change in e.changes:
                     exec(change)
 
-                normalize_stats()
+                # nromalize stats
+                for var, stat in stats.items():
+                    v = locals()[var]
+                    if v > stat.max:
+                        locals()[var] = stat.max
+                    if v < 0:
+                        locals()[var] = 0
 
                 # if this event is an ending, report back with the name of the ending
                 if e.terminal:
                     return _event
 
-                # TODO: process skips
+                skip_periods = e.skip_period
 
                 if _event in child_acts.keys():
                     events.insert(0, event_name_to_obj(_event).children[child_acts[_event]])
 
         # dump local changes back into store
         for var in stats.keys():
-            setattr(store, var, locals[var])
+            setattr(store, var, locals()[var])
 
         return False
 
@@ -205,7 +207,7 @@ class event(object):
         exprs = [ ]
 
         for i in args:
-            if isinstance(i, basestring):
+            if isinstance(i, str):
                 exprs.append(event.evaluate(i))
             else:
                 exprs.append(i)
@@ -313,6 +315,11 @@ class event(object):
 
         def eval(self, name, valid):
             global act
+            if "renpy" not in globals():
+                global store
+                global stats
+                for var in stats.keys():
+                    locals()[var] = getattr(store, var)
             return eval(self.expr)
 
     # If present as a condition to an event, an object of this
@@ -500,7 +507,7 @@ class EventChecker:
         for i in all_events:
             if not i.check(eobjs):
                 continue
-                
+
             eobjs.append(i)
 
             props = i.properties()
