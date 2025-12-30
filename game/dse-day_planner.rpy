@@ -29,7 +29,7 @@ init -100 python:
         persistent.hardcore_tracked_stats.add(var)
 
     __None = object()
-        
+
     def dp_choice(name, value=__None, enable="True", show="True"):
 
         if not __period:
@@ -37,7 +37,7 @@ init -100 python:
 
         if value is __None:
             value = name
-        
+
         __period.acts.append((name, value, enable, show))
 
     def __set_noncurried(var, value):
