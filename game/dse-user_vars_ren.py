@@ -54,11 +54,11 @@ event("chat", "act == 'call'", event.solo(), priority=200, title="_chat")
 # to class. 
 event("introduction", "act == 'class'", event.once(), event.only(), hintable=True,
         children=[
-            None, # this is here so simulator knows it's possible to not progress to child event
-            event("_introduction_focus", 
+            ("True", None), # this is here so simulator knows it's possible to not progress to child event
+            ("True", event("_introduction_focus",
                   "False", # event is only triggered by manually adding it to event queue
-                  changes=["glasses += 10", "intelligence += 5"]
-                  )
+                  changes=["glasses += 10", "intelligence += 5"])
+            )
         ])
 
 # These are the events with glasses girl.

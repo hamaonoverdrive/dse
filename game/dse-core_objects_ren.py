@@ -113,7 +113,20 @@ class EventDispatchSimulator(object):
                 if eval(enable) and eval(should_show):
                     possible_acts[period.name].append(curr_val)
 
-        return possible_acts
+        possible_children = {}
+        for period, actions in possible_acts.items():
+            for action in actions:
+                event_list = self.rolled_events[action]
+                for event in event_list:
+                    ev = event_name_to_obj(event)
+                    valid_children = []
+                    for child in ev.children:
+                        if eval(child[0]):
+                            valid_children.append(child[1])
+                    if len(valid_children) > 0:
+                        possible_children[event] = valid_children
+
+        return possible_acts, possible_children
 
     def run_day(self, acts, child_acts={}):
         # acts is expected to be dict with
@@ -122,7 +135,7 @@ class EventDispatchSimulator(object):
 
         # child_acts is dict with
         # key: event name
-        # value: index of child event to take, if not None
+        # value: name of child event to take, if not None
 
         global periods
         global events
@@ -140,7 +153,10 @@ class EventDispatchSimulator(object):
             events = self.rolled_events[act]
             while not check_skip_period() and events:
                 _event = events.pop(0)
-                events_executed[_event] = True
+                if _event in events_executed:
+                    events_executed[_event] += 1
+                else:
+                    events_executed[_event] = 1
 
                 e = event_name_to_obj(_event)
                 for change in e.changes:
@@ -161,11 +177,13 @@ class EventDispatchSimulator(object):
                 skip_periods = e.skip_period
 
                 if _event in child_acts.keys():
-                    events.insert(0, event_name_to_obj(_event).children[child_acts[_event]])
+                    events.insert(0, child_acts[_event])
 
         # dump local changes back into store
         for var in stats.keys():
             setattr(store, var, locals()[var])
+
+        self.events_executed = events_executed
 
         return False
 
@@ -231,8 +249,9 @@ class event(object):
                 self.title = self.name
 
         for child in self.children:
-            if child is not None:
-                child.is_child = True
+            # chidlren are of tuple (eval conditions, event object)
+            if child[1] is not None:
+                child[1].is_child = True
 
         global all_events
         all_events.append(self)

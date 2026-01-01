@@ -37,7 +37,10 @@ label events_run_period:
     while not check_skip_period() and events:
 
         $ _event = events.pop(0)
-        $ events_executed[_event] = True
+        if _event in events_executed:
+            $ events_executed[_event] += 1
+        else:
+            $ events_executed[_event] = 1
 
         # event titles starting with _ are ignored
         $ title = event_name_to_obj(_event).title
