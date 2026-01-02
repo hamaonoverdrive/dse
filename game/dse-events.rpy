@@ -12,106 +12,6 @@ init:
     $ narrator = Character(' ')
     
 
-init:
-    # First up, we define some simple events for the various actions, that
-    # are run only if no higher-priority event is about to occur.
-    
-    $ event("class", "act == 'class'", event.only(), priority=200, title="_class")
-    $ event("class_bad", "act == 'class'", priority=210, title="_class")
-    $ event("cut1", "act == 'cut'", event.choose_one('cut'), priority=200, title="_cut1")
-    $ event("cut2", "act == 'cut'", event.choose_one('cut'), priority=200, title="_cut2")
-    $ event("fly", "act == 'fly'", event.solo(), priority=200, title="Flying Away!")
-    $ event("study", "act == 'study'", event.solo(), priority=200, title="_study")
-    $ event("hang", "act == 'hang'", event.solo(), priority=200, title="_hang")
-    $ event("exercise", "act == 'exercise'", event.solo(), priority=200, title="_exercise")    
-    $ event("play", "act == 'play'", event.solo(), priority=200, title="_play")
-    $ event("chat", "act == 'call'", event.solo(), priority=200, title="_chat")
-
-
-    # This is an introduction event, that runs once when we first go
-    # to class. 
-    $ event("introduction", "act == 'class'", event.once(), event.only(), hintable=True,
-            children=[
-                None, # this is here so simulator knows it's possible to not progress to child event
-                event("_introduction_focus", 
-                      "False" # event is only triggered by manually adding it to event queue
-                      )
-            ])
-
-    # These are the events with glasses girl.
-    #
-    # The glasses girl is studying in the library, but we do not
-    # talk to her.
-    $ event("gg_studying",
-            # This takes place when the action is 'study'.
-            "act == 'study'",
-            # This will only take place if no higher-priority
-            # event will occur.
-            event.solo(),
-            # This takes place at least one day after seeing the
-            # introduction event.
-            event.depends("introduction"),
-            # This takes priority over the study event.
-            priority=190,
-            title="Studying (Glasses Girl)")
-
-    # She asks to borrow our pen. 
-    $ event("borrow_pen",
-            # This takes place when we go to study, and we have an int
-            # >= 50. 
-            "act == 'study' and intelligence >= 50",
-            # It runs only once.
-            event.once(),
-            # It requires the introduction event to have run at least
-            # one day before.
-            event.depends("introduction"),
-            hintable=True)
-
-    # After the pen, she smiles when she sees us.
-    $ event("gg_smiling", "act == 'study'",
-            event.solo(), event.depends("borrow_pen"),
-            priority = 180, title="Smiling")
-
-    # The bookslide.
-    $ event("bookslide", "act == 'study' and intelligence == 100",
-            event.once(), event.depends("borrow_pen"), hintable=True)
-
-    # She makes us cookies.
-    $ event("cookies", "act == 'study'",
-            event.once(), event.depends("bookslide"), hintable=True)
-
-    # Her solo ending.
-    $ event("gg_confess", "act == 'class'",
-            event.once(), event.depends("cookies"), hintable=True, title="Glasses Girl Confession")
-    
-    # Here are Sporty Girl's events that happen during the exercise act.
-    $ event("catchme", "act == 'exercise'",
-            event.depends('introduction'), event.once(), title="Catch Me!")
-    $ event("cantcatchme", "act == 'exercise'",
-            event.depends('catchme'), event.solo(), priority=190, title="Can't Catch Me!")
-    $ event("caughtme", "act == 'exercise' and strength >= 50",
-            event.depends('catchme'), event.once(), title="Caught Me!", hintable=True)
-    $ event("together", "act == 'exercise' and strength >= 50",
-            event.depends('caughtme'), event.solo(), priority=180, hintable=True)
-    $ event("apart", "act == 'exercise' and strength < 50",
-            event.depends('caughtme'), event.solo(), priority=180)
-    $ event("pothole", "act == 'exercise' and strength >= 100",
-            event.depends('caughtme'), event.once(), hintable=True)
-    $ event("dontsee", "act == 'exercise'",
-            event.depends('pothole'), event.solo(), priority=170, title="Alone...")
-    $ event("sg_confess", "act == 'class'",
-            event.depends('dontsee'), event.once(), hintable=True, title="Sporty Girl Confession")    
-    
-    # Relaxed ending with no girls happens if we max out our hidden relaxation stat.
-    $ event("relaxed_ending", "act=='hang' and relaxation >= 100", event.once(), hintable=True)
-
-    # Ending with both girls only happens if we have seen both of their final events
-    # This needs to be higher-priority than either girl's ending.    
-    $ event('both_confess', 'act == "class"',
-            event.depends("dontsee"), event.depends("cookies"),
-            event.once(), priority = 50, hintable=True, title="Double Confession!")
-     
-
 label class:
 
     "I make it to class just in time, and proceed to listen to the
@@ -135,15 +35,15 @@ label class_bad:
 label cut1:
 
     "I cut class, and spend the morning goofing off instead."
-    $ intelligence -= 10
-    $ relaxation += 10
+    # intelligence -= 10
+    # relaxation += 10
 
     return
 
 label cut2:
 
     "I cut class, and spend the morning playing computer games."
-    $ relaxation += 10
+    # relaxation += 10
     
     return
 
@@ -159,8 +59,8 @@ label study:
     "I head on down to the library, and start reading about the topics
      I should have been reading about in class."
 
-    $ intelligence += 10
-    $ relaxation -= 10    
+    # intelligence += 10
+    # relaxation -= 10
     return
 
 label hang:
@@ -168,7 +68,7 @@ label hang:
     "I spend the afternoon hanging out with my friends, killing
      some time."
      
-    $ relaxation += 10    
+    # relaxation += 10
     return
 
 label exercise:
@@ -176,8 +76,8 @@ label exercise:
     "I decide to go out for a run through the town, to keep myself in
      shape."
 
-    $ strength += 10
-    $ relaxation -= 10    
+    # strength += 10
+    # relaxation -= 10    
     return
 
 label play:
@@ -185,8 +85,8 @@ label play:
     "I pop a DVD into my video game console, and spend the evening
      rolling small cities up into balls."
 
-    $ strength -= 10
-    $ relaxation += 10    
+    # strength -= 10
+    # relaxation += 10    
     return
 
 label chat:
@@ -260,8 +160,8 @@ label _introduction_focus:
 
     "I only see it out of the corner of my eye, but I swear that the girl with the glasses is sneaking glances at me."
 
-    $ glasses += 10
-    $ intelligence += 5
+    # glasses += 10
+    # intelligence += 5
     return
     
 label gg_studying:
@@ -274,8 +174,8 @@ label gg_studying:
     "I decide not to disturb her, and instead start reading my own
      book."
 
-    $ intelligence += 10
-    $ relaxation -= 10    
+    # intelligence += 10
+    # relaxation -= 10    
 
     return
 
@@ -318,7 +218,7 @@ label borrow_pen:
 
     "She says, and she goes back to studying."
 
-    $ glasses += 30
+    # glasses += 30
 
     return
 
@@ -328,14 +228,13 @@ label gg_smiling:
 
     "The glasses girl is there, and smiles at me for a second before turning back to her book."
 
-    if glasses < 50:
-        $ glasses += 5
+    #if glasses < 50:
+    #    glasses += 5
 
-    "I decide not to disturb her, and instead start reading my own
-     book."
+    "I decide not to disturb her, and instead start reading my own book."
 
-    $ intelligence += 10
-    $ relaxation -= 10    
+    # intelligence += 10
+    # relaxation -= 10    
 
     return
 
@@ -343,34 +242,27 @@ label bookslide:
 
     "I head to the library, to get some studying done."
 
-    "The glasses girl is standing right by the entrance, putting a
-     book back into a bookcase containing science books."
+    "The glasses girl is standing right by the entrance, putting a book back into a bookcase containing science books."
 
-    "It looks quite old, and quite weak, as if it could break at any
-     time."
+    "It looks quite old, and quite weak, as if it could break at any time."
 
     "Suddenly, I hear a loud crack come from the bookcase."
 
-    "Without thinking, I throw myself between the girl and the
-     bookcase, pushing her out of the way in the process."
+    "Without thinking, I throw myself between the girl and the bookcase, pushing her out of the way in the process."
 
-    "As the shelves fail one by one, I'm hit with large textbooks on
-     topics ranging from Astronomy to Zoology."
+    "As the shelves fail one by one, I'm hit with large textbooks on topics ranging from Astronomy to Zoology."
 
     "She's safe, but I'm knocked off my feet by the falling books."
 
-    "Before the dust even settled, the girl with glasses realized what
-     happened and asked:"
+    "Before the dust even settled, the girl with glasses realized what happened and asked:"
 
     gg "Are you alright?"
 
-    "I tell her that I am, all the while rubbing a bruise left by a
-     particularly large Physics book."
+    "I tell her that I am, all the while rubbing a bruise left by a particularly large Physics book."
 
     gg "You saved me."
 
-    "She points out. I shrug... I guess I did, but it's not like I'm a
-     hero or anything."
+    "She points out. I shrug... I guess I did, but it's not like I'm a hero or anything."
 
     "She extends out her hand, I take it, and she helps me to get up."
 
@@ -378,11 +270,9 @@ label bookslide:
 
     "She doesn't know what to say."
 
-    "I suggest that we help clean up the mess, mostly to take her off
-     the spot."
+    "I suggest that we help clean up the mess, mostly to take her off the spot."
 
-    "She agrees, and together we begin piling the books up into neat
-     piles."
+    "She agrees, and together we begin piling the books up into neat piles."
 
     "I end up walking her home. She doesn't say much, but we both seem to enjoy quiet companionship."
     
@@ -390,10 +280,10 @@ label bookslide:
     
     "But it was definitely worth it."
 
-    $ glasses = 70
+    # glasses = 70
         
     #This will end the current period and skip the next one.
-    jump events_skip_period
+    # jump events_skip_period
 
     return
 
@@ -416,8 +306,7 @@ label cookies:
 
     gg "It's to thank you."
 
-    "She points out... She's probably not used to this. Especially
-     with guys."
+    "She points out... She's probably not used to this. Especially with guys."
 
     "I take one of them, and stick it in my mouth."
 
@@ -425,17 +314,15 @@ label cookies:
 
     "It's perhaps one of the best cookies I've ever tasted."
 
-    "Of course it is. It's the only cookie I'd ever tasted that was
-     made for me by a beutiful girl."
+    "Of course it is. It's the only cookie I'd ever tasted that was made for me by a beutiful girl."
 
     "I tell her this... that it's delicious, not the girl part."
 
-    "But I do let slip that if I could eat these every day, I'd be the
-     happiest guy in the world."
+    "But I do let slip that if I could eat these every day, I'd be the happiest guy in the world."
 
     "At this, she can only blush."
 
-    $ glasses = 100
+    # glasses = 100
 
     return
 
@@ -483,8 +370,7 @@ label gg_confess:
 
     ".:. Ending 1."
 
-    $ persistent.hardcore_label = None
-    $ renpy.full_restart()
+    return
 
 
 label catchme:
@@ -519,7 +405,7 @@ label catchme:
 
     "Even though I'm jogging, she pulls away as if it is nothing."
 
-    $ sporty = 30
+    # sporty = 30
 
     return
 
@@ -533,14 +419,14 @@ label cantcatchme:
 
     sg "Well, maybe."
 
-    if sporty < 50:
-        $ sporty += 5
+    #if sporty < 50:
+    #    sporty += 5
 
     "She pulls out past me, and disappears into the distance. One day
      I'll catch up to her."
 
-    $ strength += 10
-    $ relaxation -= 10    
+    # strength += 10
+    # relaxation -= 10    
 
     return
 
@@ -584,29 +470,26 @@ label caughtme:
 
     "I nod a third time, and we take off, running side by side."
 
-    if sporty < 70:
-        $ sporty += 10
+    #if sporty < 70:
+    #    sporty += 10
 
-    $ strength += 10
-    $ relaxation -= 10    
+    # strength += 10
+    # relaxation -= 10    
 
     return
 
 label together:
 
-    "I start running, and meet up with the sporty girl as she passes
-     the street in front of my house."
+    "I start running, and meet up with the sporty girl as she passes the street in front of my house."
 
-    "She's still better than me... she's been running for over a mile
-     before reaching this point."
+    "She's still better than me... she's been running for over a mile before reaching this point."
 
-    "Still, I can keep up with her for the rest of the run. And that's
-     not bad."
+    "Still, I can keep up with her for the rest of the run. And that's not bad."
 
-    if sporty < 70:
-        $ sporty += 5
+    # if sporty < 70:
+    #    sporty += 5
 
-    $ strength += 10
+    # strength += 10
 
     return
 
@@ -625,11 +508,11 @@ label apart:
     "She's right, of course, and I redouble my efforts to try to keep
      up with her."
 
-    if sporty < 70:
-        $ sporty += 10
+    #if sporty < 70:
+    #    sporty += 10
 
-    $ strength += 10
-    $ relaxation -= 10    
+    # strength += 10
+    # relaxation -= 10    
     return
 
 label pothole:
@@ -689,10 +572,10 @@ label pothole:
     
     "But it was definitely worth it."
 
-    $ sporty = 100
+    # sporty = 100
     
     #This will end the current period and skip the next one.
-    jump events_skip_period
+    #jump events_skip_period
 
     return
 
@@ -762,8 +645,7 @@ label sg_confess:
 
     ".:. Ending 2."
 
-    $ persistent.hardcore_label = None
-    $ renpy.full_restart()
+    return
 
 
 label both_confess:
@@ -833,9 +715,9 @@ label both_confess:
 
     ".:. Ending 3."
 
-    $ persistent.hardcore_label = None
-    $ renpy.full_restart()
-    
+    return
+
+
 label relaxed_ending:
     "I had cut class and slacked off so much, that I was way behind."
     "There was no way I was ever going to catch up."
@@ -845,5 +727,5 @@ label relaxed_ending:
     "...right?"
     
     ".:. Ending 4."
-    $ persistent.hardcore_label = None
-    $ renpy.full_restart()    
+
+    return
