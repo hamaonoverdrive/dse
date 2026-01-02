@@ -1,6 +1,8 @@
 # These are core dse objects that have been partitioned off to allow for simulation
 # of playthroughs in a non-renpy python session.
 
+# This is not intended to be user-modified.
+
 # code here will be executed by python interpreter, but not renpy.
 
 import random
@@ -28,6 +30,9 @@ class __Stat(object):
         self.max = max
 
 
+# duplicating the methods for declaring periods, choices, and stats here
+# because we need to store these in a different place than the variables that renpy would use
+
 def register_stat(name, var, default=0, max=100, hidden=False, relationship=False):
     global store
     global stats
@@ -35,6 +40,7 @@ def register_stat(name, var, default=0, max=100, hidden=False, relationship=Fals
     stats[var] = __Stat(name, default, max)
     setattr(store, var, default)
 
+# called to reset our stored variables to their defaults
 def reset():
     global events_executed
     global events_executed_yesterday
@@ -55,7 +61,6 @@ class Period(object):
         global period_order
         period_order.append(self)
 
-
 def dp_period(name, var):
     global periods
     periods[name] = Period(name, var)
@@ -71,6 +76,8 @@ def dp_choice(name, value=object(), enable="True", show="True"):
     period_order[-1].acts.append((name, value, enable, show))
 
 
+# core object for running renpy simulaitons
+# basically a standin for the code in dse-event_dispatcher.rpy
 class EventDispatchSimulator(object):
     def __init__(self):
         self.rolled_events = None
@@ -219,6 +226,8 @@ class event(object):
         return '<event ' + self.name + '>'
 
     def __init__(self, name, *args, **kwargs):
+        # note: all non-keyworeded arguments are assumed to be conditions for the event to run
+        # all event specifications MUST be keyworded.
 
         self.name = name
 
@@ -232,18 +241,19 @@ class event(object):
 
         self.exprs = exprs
 
-        self.priority = kwargs.get('priority', 100)
-        self.hintable = kwargs.get("hintable", False)
-        self.children = kwargs.get("children", [ ])
-        self.changes = kwargs.get("changes", [ ])
-        self.terminal = kwargs.get("terminal", False)
-        self.skip_period = kwargs.get("skip_period", 0) # only used in simulator
-        self.is_child = False
+        self.priority = kwargs.get('priority', 100)  # where the event gets sorted on the list of events for an action
+        self.hintable = kwargs.get("hintable", False)  # whether the event will highlight the option on the day planner screen, if it has been rolled
+        self.children = kwargs.get("children", [ ])  # other events that can be called from choices/conditionals made in this one. Expected to be a tuple of (condition when callable, event())
+        self.changes = kwargs.get("changes", [ ])  # changes that the event makes to stored stats
+        self.terminal = kwargs.get("terminal", False)  # whether the event is one that ends the game
+        self.skip_period = kwargs.get("skip_period", 0)  # whether periods are skipped after this event is run
+        self.is_child = False  # automatically set to True on child events
+        self.title = kwargs.get("title", None)  # title for the event in the event viewer and event screen
 
-        self.title = kwargs.get("title", None)
         if self.title is None:
             # if name starts with an underscore that means it's one we want to mark as hidden
             if self.name[0] != "_":
+                # otherwise, automatically remove underscores from the label name and capitalize it
                 self.title = self.name.replace("_"," ").title()
             else:
                 self.title = self.name
@@ -253,7 +263,7 @@ class event(object):
             if child[1] is not None:
                 child[1].is_child = True
 
-        global all_events
+        global all_events # needed for python simulation, redundant for renpy
         all_events.append(self)
 
     # Checks to see if this event is valid. It's called with
@@ -333,9 +343,10 @@ class event(object):
             self.expr = expr
 
         def eval(self, name, valid):
-            global act
+            # this needs to tediously load in from our fake "store" object if we're not in renpy
             if "renpy" not in globals():
                 global store
+                global act
                 global stats
                 for var in stats.keys():
                     locals()[var] = getattr(store, var)
@@ -476,6 +487,8 @@ def check_skip_period():
         return False
 
 
+# If there is an event in all_events with a given name, return it
+# particularly useful method because we can serialize event names but not event()s
 def event_name_to_obj(name):
     global all_events
     for e in all_events:
@@ -484,8 +497,10 @@ def event_name_to_obj(name):
     return None
 
 
+# object to look at our current gamestate and return all the possible events that could be rolled in those circumstances
 class EventChecker:
 
+    # sets events and act to the right values given a specific act
     def setActVars(selected_act):
         global act
         global events
@@ -493,6 +508,7 @@ class EventChecker:
         act = selected_act
         events = rolled_events[act]
 
+    # gets all possible events that could be played right now
     def getAllValid():
         global periods
         global act
@@ -514,6 +530,7 @@ class EventChecker:
             act = old_act
         return results
 
+    # gets all events that could be rolled for the currently configured value of "act"
     def getValid():
         global all_events
 

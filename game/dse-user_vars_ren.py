@@ -119,7 +119,7 @@ event("gg_confess", "act == 'class'",
 
 # Here are Sporty Girl's events that happen during the exercise act.
 event("catchme", "act == 'exercise'",
-        event.depends('introduction'), event.once(), title="Catch Me!", changes=["sporty = 30"])
+        event.depends('introduction'), event.once(), title="Catch Me!", changes=["sporty = 30", "strength += 10"])
 event("cantcatchme", "act == 'exercise'",
         event.depends('catchme'), event.solo(), priority=190, title="Can't Catch Me!",
         changes=["if sporty < 50: sporty += 5", "strength += 10", "relaxation -= 10"]

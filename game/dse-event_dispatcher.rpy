@@ -75,7 +75,8 @@ label events_run_period:
     return
 
 """ DEPRECATED!
-Don't use the following over setting skip_period in the event declaration
+Don't use the following, set skip_period in the event declaration instead.
+
 Jumping to these may cause issues with not applying changed stats!
 
 # If this is jumped to, it will end the current period immediately,

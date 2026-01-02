@@ -2,11 +2,17 @@
 Dating Sim Engine for Ren'Py
 The Dating Sim Engine (DSE) is a framework for writing games based on events that are triggered by statistics. It comprises a number of independent modules that can be combined to create games. 
 
-## Development goals for this fork
-- [x] Update core renpy files to modern versions
-- [x] "Relationship status" screen that shows selected stats
-- [x] Optional "Hardcore" mode, which disables saves and stores all user data in persistent variables
-- [x] ~~Optional "Quick" mode, which skips already-seen events faster than renpy text skip~~ Decided to cut this, would be very tedious to implement 'short' versions of events for this mode
-- [x] Allow specified random events to be rolled before player makes schedule selection, and display "hints" for the respective activities
-- [x] Event viewer menu, which allows the player to revisit any scene that they have already seen. **Note: This uses the renpy replay function and may lead to undesired behavior if contents of events are conditioned on player stats**. There may be a patch to address this in the future.
-- [ ] **Stretch goal**: refactor some objects into `_ren.py` files and write a framework to simulate playthroughs and predict player stat gain under different play strategies.
+## Features of this fork
+- Core renpy files updated to modern versions.
+- Additional "Relationship status" screen that displays scores with love interests.
+- Optional "Hardcore" mode, which disables saves and stores all user data in persistent variables.
+- Random events for each day are rolled at the start of the day, instead of right before they occur.
+- Because events for a day are pre-determined, "hintable" events will be highlighted on the scheduler.
+- An event viewer menu, which allows the player to revisit any scene that they have already seen. **Note: This uses the renpy replay function and may lead to undesired behavior if contents of events are conditioned on player stats**. There may be a patch to address this in the future.
+- And last, but certainly not least: an included [gameplay simulator](game/dse-simulator.ipynb) which can predict player stat values and endings under different play strategies.
+
+# Key usage notes
+- For hardcore mode to work, **all** variables that store user states need to be declared with `register_stat()`
+- Most user variables (ie: event objects, period and act definitions) should be placed in `game/dse-user_vars_ren.py`
+- Labels and script for each of these events are in `game/dse-events.rpy`
+- `label start:` and the core day loop are in `game/dse-schedule.rpy`
