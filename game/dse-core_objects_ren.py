@@ -314,7 +314,7 @@ class event(object):
             return False
 
         for child in self.children:
-            if child is not None and not child.is_visitable(True):
+            if child[1] is not None and not child[1].is_visitable(True):
                 return False
         return True
 
