@@ -19,6 +19,6 @@ The Dating Sim Engine (DSE) is a framework for writing games based on events tha
 
 # Known Issues
 These are being discovered as I develop Bloodsport Duel SiMulator, and will be fixed once that gamejam is done.
-[ ] All hardcore values need to be initialized before first day, otherwise quitting on a new save will be unloadable
-[ ] Event viewer label needs to be manually marked as seen to guarantee that it works
-[ ] Need to block rollback between event calls in the event viewer in order to prevent rollback from causing crash
+- [ ] All hardcore values need to be initialized before first day, otherwise quitting on a new save will be unloadable
+- [ ] Event viewer label needs to be manually marked as seen to guarantee that it works
+- [ ] Need to block rollback between event calls in the event viewer in order to prevent rollback from causing crash
