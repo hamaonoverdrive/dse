@@ -23,6 +23,7 @@ These are being discovered as I develop Bloodsport Duel SiMulator, and will be f
 - [ ] Event viewer label needs to be manually marked as seen to guarantee that it works
 - [ ] Need to block rollback between event calls in the event viewer in order to prevent rollback from causing crash
 - [ ] Missing `/tl/None/common.rpym` from modern default project
+- [ ] EventChecker needs to make a `copy.copy` of `rolled_events[act]`, and then run `rolled_events[act].remove(_event)` after completing event call and before forcing hardcore save
 
 ## Things to be backported to core DSE fork
 - [ ] Updated `screen.rpy`, `options.rpy`, and `gui.rpy` files
